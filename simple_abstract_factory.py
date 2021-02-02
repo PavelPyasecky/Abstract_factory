@@ -55,6 +55,67 @@ class WariorFactory(HeroFactory):
             return "Power"
 
 
+class MageFactory(HeroFactory):
+    class Hero:
+        def __init__(self, name):
+            self.name = name
+            self.weapon = None
+            self.armor = None
+            self.spell = None
+
+        def add_weapon(self, weapon):
+            self.weapon = weapon
+
+        def add_spell(self, spell):
+            self.spell = spell
+
+        def hit(self):
+            print(f"Mage hits with {self.weapon.hit()}")
+            self.weapon.hit()
+
+        def cast(self):
+            print(f"Mage casts {self.spell.cast()}")
+            self.spell.cast()
+
+    class Weapon:
+        def hit(self):
+            return "Staff"
+
+    class Spell:
+        def cast(self):
+            return "Fireball"
+
+
+class AssassinFactory(HeroFactory):
+    class Hero:
+        def __init__(self, name):
+            self.name = name
+            self.weapon = None
+            self.armor = None
+            self.spell = None
+
+        def add_weapon(self, weapon):
+            self.weapon = weapon
+
+        def add_spell(self, spell):
+            self.spell = spell
+
+        def hit(self):
+            print(f"Assassin hits with {self.weapon.hit()}")
+            self.weapon.hit()
+
+        def cast(self):
+            print(f"Assassin casts {self.spell.cast()}")
+
+    class Weapon:
+        def hit(self):
+            return "Dagger"
+
+    class Spell:
+        def cast(self):
+            return "Invisibility"
+
+
 def factory_constructor(loader, node):
     data = loader.construct_scalar(node)
     if data == "assassin":
@@ -63,7 +124,6 @@ def factory_constructor(loader, node):
         return MageFactory()
     else:
         return WariorFactory()
-
 
 
 class Character(yaml.YAMLObject):
@@ -82,7 +142,7 @@ class Character(yaml.YAMLObject):
 
 if __name__ == '__main__':
     loader = yaml.Loader
-    loader.add_constructor("!factory", factory_constructor())
+    loader.add_constructor("!factory", factory_constructor)
 
     hero = yaml.load(hero_yaml).create_hero()
 
