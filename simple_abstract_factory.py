@@ -1,4 +1,13 @@
-from abc import ABC, abstractmethod
+import yaml
+
+
+hero_yaml = '''
+--- !Character
+factory:
+    !factory assassin
+name:
+    7Nagibator7
+'''
 
 
 class HeroFactory:
@@ -46,18 +55,36 @@ class WariorFactory(HeroFactory):
             return "Power"
 
 
-def create_hero(factory):
-    hero = factory.create_hero("Nagibator")
-    weapon = factory.create_weapon()
-    spell = factory.create_spell()
+def factory_constructor(loader, node):
+    data = loader.construct_scalar(node)
+    if data == "assassin":
+        return AssassinFactory()
+    if data == "mage":
+        return MageFactory()
+    else:
+        return WariorFactory()
 
-    hero.add_weapon(weapon)
-    hero.add_spell(spell)
 
-    return hero
+
+class Character(yaml.YAMLObject):
+    yaml_tag = "!Character"
+
+    def create_hero(self):
+        hero = self.factory.create_hero(self.name)
+        weapon = self.factory.create_weapon()
+        spell = self.factory.create_spell()
+
+        hero.add_weapon(weapon)
+        hero.add_spell(spell)
+
+        return hero
 
 
 if __name__ == '__main__':
-    player = create_hero(WariorFactory())
-    player.hit()
-    player.cast()
+    loader = yaml.Loader
+    loader.add_constructor("!factory", factory_constructor())
+
+    hero = yaml.load(hero_yaml).create_hero()
+
+    hero.hit()
+    hero.cast()
